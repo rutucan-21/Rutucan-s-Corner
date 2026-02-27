@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self'; 
+        script-src 'self' 'unsafe-inline' https://www.tiktok.com; 
+        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; 
+        font-src 'self' https://fonts.gstatic.com;
+        img-src 'self' data: https://cdn.akamai.steamstatic.com https://via.placeholder.com;
+        frame-src https://www.youtube.com https://player.twitch.tv https://www.tiktok.com;
+        connect-src 'self' https://steam-games-1.muebleaga49.workers.dev/;">
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rutucan's Corner</title>
+    
+    <link rel="icon" type="image/png" href="favicon.png">
+    
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0a; --card-bg: rgba(20, 20, 20, 0.4); --accent: #b589d6;
+            --border: #222222; --text: #888888;
+            --terminal-width: 1300px;
+            --hover-bg: rgba(181, 137, 214, 0.05);
+        }
+
+        /* --- THEMES --- */
+        body.theme-light { --bg: #d9c5b2; --card-bg: rgba(200, 180, 160, 0.4); --accent: #7a4a2a; --border: #bda691; --text: #3d2b1f; --hover-bg: rgba(122, 74, 42, 0.1); }
+        body.theme-green { --bg: #050a05; --card-bg: #081208; --accent: #234f1e; --border: #1a3a16; --text: #a7c4a0; --hover-bg: rgba(35, 79, 30, 0.2); }
+        body.theme-blue { --bg: #020412; --card-bg: #0a0e24; --accent: #4d61ff; --border: #1e2a5a; --text: #a5b4fc; --hover-bg: rgba(77, 97, 255, 0.15); }
+
+        /* --- CLOUD BASE --- */
+        #aero-clouds {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1; display: none; pointer-events: none; overflow: hidden;
+        }
+        .cloud {
+            position: absolute; background: white; filter: blur(50px);
+            border-radius: 50%; opacity: 0.3; animation: moveClouds linear infinite;
+        }
+        @keyframes moveClouds {
+            from { transform: translateX(-350px); }
+            to { transform: translateX(calc(100vw + 350px)); }
+        }
+
+        /* --- UPDATED AERO PEAK (WINDOWS VISTA/7 STYLE) --- */
+        body.theme-aero #aero-clouds { 
+            display: block; 
+            background: linear-gradient(135deg, #1e528e 0%, #2979ff 50%, #72aade 100%); 
+        }
+        body.theme-aero { 
+            --bg: transparent; 
+            --card-bg: rgba(255, 255, 255, 0.15); 
+            --accent: #00e5ff; 
+            --border: rgba(255, 255, 255, 0.4); 
+            --text: #ffffff; 
+            --hover-bg: rgba(255, 255, 255, 0.25);
+        }
+        body.theme-aero .card, 
+        body.theme-aero .status-bar,
+        body.theme-aero .theme-indicator,
+        body.theme-aero .theme-toggle,
+        body.theme-aero .btn { 
+            backdrop-filter: blur(25px) saturate(180%); 
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-top: 1px solid rgba(255, 255, 255, 0.8);
+            border-left: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37),
+                        inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        body.theme-aero .card h2 {
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.8);
+            font-weight: 500;
+        }
+
+        /* --- COZY LO-FI --- */
+        body.theme-rain { 
+            --bg: transparent; 
+            --card-bg: rgba(28, 20, 15, 0.85); 
+            --accent: #e2a87e; 
+            --border: rgba(226, 168, 126, 0.25); 
+            --text: #f3e5d8; 
+            --hover-bg: rgba(226, 168, 126, 0.1); 
+        }
+        body.theme-rain #aero-clouds { 
+            display: block; 
+            background: linear-gradient(to bottom, #140d08 0%, #2b1e16 100%); 
+        }
+        body.theme-rain .cloud { 
+            background: #4a3528; 
+            opacity: 0.3; 
+            filter: blur(80px);
+        }
+        #rain-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; display: none; pointer-events: none; }
+        body.theme-rain #rain-canvas { display: block; }
+        
+        body.theme-rain .card, 
+        body.theme-rain .status-bar,
+        body.theme-rain .theme-indicator,
+        body.theme-rain .theme-toggle { 
+            backdrop-filter: blur(18px) saturate(120%); 
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 
+                        inset 0 0 10px rgba(226, 168, 126, 0.05);
+        }
+
+        /* --- RAINBOW VOMIT --- */
+        @keyframes rgb-shift {
+            0% { color: #ff0000; border-color: #ff0000; }
+            33% { color: #00ff00; border-color: #00ff00; }
+            66% { color: #0000ff; border-color: #0000ff; }
+            100% { color: #ff0000; border-color: #ff0000; }
+        }
+        body.theme-rgb { --bg: #050505; --card-bg: rgba(10, 10, 10, 0.8); --accent: #fff; --border: #333; --text: #eee; }
+        body.theme-rgb .status-segment, body.theme-rgb .sidebar-header, body.theme-rgb h2, body.theme-rgb .theme-toggle,
+        body.theme-rgb .theme-indicator, body.theme-rgb .ttt-cell, body.theme-rgb #snake-canvas, body.theme-rgb #strike-canvas { animation: rgb-shift 3s infinite linear; }
+        body.theme-rgb .card, body.theme-rgb .status-bar, body.theme-rgb .btn, body.theme-rgb .feed-container { animation: rgb-shift 3s infinite linear; }
+
+        /* --- CORE --- */
+        html, body { background-color: var(--bg) !important; margin: 0; padding: 0; color: var(--text); font-family: 'DM Mono', monospace; min-height: 100vh; overflow-x: hidden; transition: background 0.4s; }
+        #starfield { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+
+        .status-bar { 
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%); 
+            width: 600px; height: 38px; background: var(--card-bg);
+            border: 1px solid var(--border); display: flex; align-items: center; 
+            justify-content: space-between; padding: 0 20px; z-index: 100; 
+            backdrop-filter: blur(8px); transition: 0.3s ease;
+        }
+        .status-bar:hover { border-color: var(--accent); background: var(--hover-bg); }
+        .status-segment { color: var(--accent); font-size: 9px; letter-spacing: 2px; text-transform: uppercase; }
+
+        .layout-wrapper {
+            position: relative; display: grid; grid-template-columns: 140px 1fr 300px 180px; 
+            gap: 30px; padding: 120px 20px 90px 20px; max-width: var(--terminal-width); margin: 0 auto; z-index: 10;
+        }
+        .nav-dock, .media-wing, .link-rail { position: sticky; top: 120px; height: fit-content; display: flex; flex-direction: column; }
+        
+        .btn, .external-link-btn { 
+            background: transparent; border: 1px solid var(--border); color: var(--text); 
+            width: 100%; height: 38px; cursor: pointer; font-family: inherit; 
+            text-transform: uppercase; font-size: 10px; transition: 0.3s; 
+            margin-bottom: 8px; display: flex; align-items: center; padding-left: 12px;
+            text-decoration: none; box-sizing: border-box;
+        }
+        .btn:hover, .external-link-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--hover-bg); padding-left: 18px; }
+
+        .card { border: 1px solid var(--border); padding: 30px; background: var(--card-bg); backdrop-filter: blur(2px); transition: 0.3s ease; margin-bottom: 20px; }
+        .card:hover { border-color: var(--accent); background: var(--hover-bg); transform: translateY(-2px); }
+        .card h2 { color: var(--accent); font-size: 14px; margin: 0 0 15px 0; }
+
+        .sidebar-header { font-size: 10px; color: var(--accent); letter-spacing: 2px; padding-bottom: 10px; margin-bottom: 15px; border-bottom: 1px solid var(--border); }
+        .mini-feed { margin-bottom: 25px; }
+        .mini-feed h3 { font-size: 9px; color: #555; margin: 0 0 8px 0; text-transform: uppercase; }
+        
+        .feed-container { position: relative; background: #000; border: 1px solid var(--border); transition: all 0.3s ease; overflow: hidden; }
+        .feed-container:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+
+        .video-box { padding-bottom: 56.25%; height: 0; position: relative; }
+        .video-box iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        .tiktok-wrap { height: 280px; }
+
+        /* --- THEME POPUP --- */
+        .controls-group { position: fixed; bottom: 25px; left: 25px; display: flex; align-items: center; gap: 10px; z-index: 1000; }
+        
+        #theme-menu { 
+            position: absolute; bottom: 55px; left: 0; 
+            background: var(--card-bg); border: 1px solid var(--border); 
+            backdrop-filter: blur(15px); display: none; flex-direction: column; 
+            padding: 8px; gap: 4px; min-width: 180px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+        }
+        #theme-menu.active { display: flex; animation: menuUp 0.2s ease-out; }
+        
+        .theme-option { 
+            background: transparent; border: 1px solid transparent; color: var(--text); 
+            padding: 8px 12px; text-align: left; font-family: inherit; font-size: 10px; 
+            letter-spacing: 1px; cursor: pointer; transition: 0.2s; text-transform: uppercase;
+        }
+        .theme-option:hover { border-color: var(--accent); color: var(--accent); background: var(--hover-bg); }
+
+        .theme-toggle { width: 45px; height: 45px; background: var(--card-bg); border: 1px solid var(--border); color: var(--accent); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 24px; transition: all 0.4s ease; }
+        .theme-toggle:hover { border-color: var(--accent); transform: rotate(180deg); }
+        .theme-indicator { height: 45px; padding: 0 15px; border: 1px solid var(--border); color: var(--accent); display: flex; align-items: center; font-size: 10px; letter-spacing: 2px; background: var(--card-bg); min-width: 140px; }
+
+        @keyframes menuUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- ARCADE SECTOR --- */
+        #arcade-wrapper { display: none; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; }
+        .ttt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 15px; }
+        .ttt-cell { aspect-ratio: 1; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; background: rgba(0,0,0,0.4); transition: 0.2s; font-weight: bold; }
+        .ttt-cell:hover { border-color: var(--accent); color: var(--accent); background: var(--hover-bg); }
+        .ttt-cell.winner { border-color: var(--accent); color: var(--accent); background: var(--hover-bg); box-shadow: inset 0 0 15px var(--hover-bg); }
+        
+        canvas.game-canvas { background: rgba(0,0,0,0.8); border: 1px solid var(--border); width: 100%; aspect-ratio: 1; transition: 0.3s ease; image-rendering: pixelated; cursor: pointer; }
+        canvas.game-canvas:hover { border-color: var(--accent); }
+        
+        .game-meta { font-size: 9px; display: flex; justify-content: space-between; margin-top: 15px; color: var(--accent); border-top: 1px solid var(--border); padding-top: 10px; }
+        .game-msg { font-size: 9px; color: var(--text); margin-top: 10px; text-align: center; height: 12px; text-transform: uppercase; }
+
+        .interest-link { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; transition: 0.2s; }
+        .interest-link:hover { border-bottom-color: var(--accent); }
+
+        /* --- STEAM LIBRARY GRID --- */
+        .library-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; margin-top: 20px; }
+        .game-card { border: 1px solid var(--border); padding: 10px; background: var(--card-bg); text-align: center; transition: 0.3s; }
+        .game-card:hover { border-color: var(--accent); background: var(--hover-bg); }
+        .game-card img { width: 100%; border-radius: 2px; }
+
+        @media (max-width: 1100px) { 
+            .layout-wrapper { grid-template-columns: 1fr; padding-top: 100px; } 
+            .status-bar { width: 90%; } 
+            #arcade-wrapper { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div id="aero-clouds"></div>
+    <canvas id="rain-canvas"></canvas>
+    <canvas id="starfield"></canvas>
+    
+    <div class="status-bar">
+        <div class="status-segment" id="nav-status">LOC: // HOME</div>
+        <div class="status-segment" id="hover-status">INSPECT: // NULL</div>
+    </div>
+
+    <div class="controls-group">
+        <div id="theme-menu"></div>
+        <button class="theme-toggle" onclick="toggleThemeMenu()" data-label="THEME MENU">✦</button>
+        <div class="theme-indicator" id="theme-label">DEFAULT</div>
+    </div>
+
+    <div class="layout-wrapper">
+        <nav class="nav-dock">
+            <button class="btn" onclick="showPage('home')" data-label="HOME TAB">Home</button>
+            <button class="btn" onclick="showPage('games')" data-label="MINIGAMES TAB">Minigames</button>
+            <button class="btn" onclick="showPage('library')" data-label="STEAM ARCHIVE">Library</button>
+            <button class="btn" onclick="showPage('about')" data-label="ABOUT TAB">About</button>
+        </nav>
+        <main class="content-area">
+            <div id="page-content"></div>
+            <div id="arcade-wrapper">
+                <div class="card" data-label="TTT_CORE_MINIMAX">
+                    <h2 id="ttt-header">TTT_PROTO.V2</h2>
+                    <div class="ttt-grid">
+                        <div class="ttt-cell" onclick="makeMove(0)"></div><div class="ttt-cell" onclick="makeMove(1)"></div><div class="ttt-cell" onclick="makeMove(2)"></div>
+                        <div class="ttt-cell" onclick="makeMove(3)"></div><div class="ttt-cell" onclick="makeMove(4)"></div><div class="ttt-cell" onclick="makeMove(5)"></div>
+                        <div class="ttt-cell" onclick="makeMove(6)"></div><div class="ttt-cell" onclick="makeMove(7)"></div><div class="ttt-cell" onclick="makeMove(8)"></div>
+                    </div>
+                    <div class="game-meta"><span>W: <b id="s-w">0</b></span><span>L: <b id="s-l">0</b></span><span>D: <b id="s-d">0</b></span></div>
+                    <div class="game-msg" id="ttt-msg">IMPOSSIBLE MODE ACTIVE</div>
+                </div>
+                <div class="card" data-label="SNAKE PROTOCOL">
+                    <h2 id="snake-header">SNAKE_PROTO.V3</h2>
+                    <canvas id="snake-canvas" class="game-canvas"></canvas>
+                    <div class="game-meta"><span>SCORE: <b id="snake-score">0</b></span><span>BEST: <b id="snake-best">0</b></span></div>
+                    <div class="game-msg" id="snake-msg">WASD TO START | AUTO-SPEED ENABLED</div>
+                </div>
+                <div class="card" data-label="STRIKE PROTOCOL">
+                    <h2 id="strike-header">STRIKE_PROTO.V2</h2>
+                    <canvas id="strike-canvas" class="game-canvas" onclick="startStrike()"></canvas>
+                    <div class="game-meta"><span>STRIKE: <b id="strike-score">0</b></span><span>SHIELD: <b id="strike-lives">3</b></span></div>
+                    <div class="game-msg" id="strike-msg">CLICK TO INITIALIZE V2</div>
+                </div>
+            </div>
+        </main>
+        <aside class="media-wing">
+            <div class="sidebar-header">FROM RUTUCAN:</div>
+            <div class="mini-feed"><h3>01 // YOUTUBE</h3><div class="feed-container" data-label="YOUTUBE FEED"><div class="video-box"><iframe id="yt-frame" allowfullscreen></iframe></div></div></div>
+            <div class="mini-feed"><h3>02 // TWITCH</h3><div class="feed-container" data-label="TWITCH FEED"><div class="video-box"><iframe id="twitch-player" allowfullscreen></iframe></div></div></div>
+            <div class="mini-feed"><h3>03 // TIKTOK</h3><div class="feed-container" data-label="TIKTOK FEED"><div class="tiktok-wrap"><blockquote class="tiktok-embed" cite="https://www.tiktok.com/@rutucanuk" data-unique-id="rutucanuk" data-embed-type="creator"><section><a target="_blank" href="https://www.tiktok.com/@rutucanuk">@rutucanuk</a></section></blockquote></div></div></div>
+        </aside>
+        <aside class="link-rail">
+            <div class="sidebar-header">DIRECTORY</div>
+            <a href="https://www.youtube.com/channel/UCCY2weu3eIzgvytq-FPyO9g" class="external-link-btn" target="_blank" data-label="YOUTUBE CHANNEL">YOUTUBE</a>
+            <a href="https://www.twitch.tv/rutucantv" class="external-link-btn" target="_blank" data-label="TWITCH CHANNEL">TWITCH</a>
+            <a href="https://www.tiktok.com/@rutucanuk" class="external-link-btn" target="_blank" data-label="TIKTOK PROFILE">TIKTOK</a>
+            <a href="https://www.instagram.com/rutucan.mort" class="external-link-btn" target="_blank" data-label="INSTAGRAM">INSTAGRAM</a>
+            <a href="https://steamcommunity.com/id/rutucan" class="external-link-btn" target="_blank" data-label="STEAM ID">STEAM</a>
+        </aside>
+    </div>
+
+    <script async src="https://www.tiktok.com/embed.js"></script>
+    <script>
+        // Use your NEW and working Worker URL here
+        const WORKER_URL = 'https://steam-games-1.muebleaga49.workers.dev/';
+
+        const youtubeID = "UCCY2weu3eIzgvytq-FPyO9g"; const uploadsID = youtubeID.replace(/^UC/, "UU");
+        const contentData = {
+            home: `<div class="card"><h2>Site Bengos</h2><p>Ia uite ce frumi e sa muriti voi daca nu. Stiti de ce ii misto site u asta? Ii facut de mine. Cam gol site u asta ziceti? Lasa ca mai fac yo la el... </p></div>`,
+            games: `<div class="card"><h2>ARCADE SECTOR</h2><p> Jocuri mai bune decat pe steam sa mor daca va mint.Lol. 🛌<-eu mort gen. WASD to play Snake, Space/WASD to play Strike.</p></div>`,
+            about: `<div class="card"><h2>ABOUT_ME</h2><p>Cine drq mai are about me in marele 26? nush lol. Anyway. Acest site foarte bengos si coios este facut de je' pentru je' cum ar veni. Daca aveti ochi puteti observa ca in partea dreapta a ecranului aveti link urile spre Socials urile(?) mele. Deci daca vreti content calitativ intrati si voi pacolo. Daca nu intrati pe tabu cu minigames si dovediti acele jocuri bengoase.</p></div>
+                    <div class="card" data-label="INTERESTS_MODULE"><h2>INTERESTS_LOG</h2><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 11px;"><div>> <a href="https://mylists.info/profile/Rutucan" class="interest-link" target="_blank">ANIME</a></div><div>> Nu mai te mai uita bulangiu friguros</div><div>> <a href="https://steamcommunity.com/id/rutucan" class="interest-link" target="_blank">GAMING (cam evident)</a></div><div>> Coae inca citesti?</div><div>> <a href="https://www.last.fm/user/rutucan" class="interest-link" target="_blank">MUSIC</a></div><div>> Dute daici</div></div></div>`,
+            library: `<div class="card"><h2>CENTRAL_ARCHIVE // STEAM_LIBRARY</h2><div id="steam-list" class="library-grid">SCANNING STEAM DATA...</div></div>`
+        };
+
+        async function loadLibrary() {
+            const listContainer = document.getElementById('steam-list');
+            try {
+                const response = await fetch(WORKER_URL);
+                if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+                
+                const data = await response.json();
+                
+                // Added check to ensure data and response.games exist before sorting
+                const games = (data.response && data.response.games) 
+                    ? data.response.games.sort((a, b) => b.playtime_forever - a.playtime_forever) 
+                    : [];
+
+                if (games.length === 0) {
+                    listContainer.innerHTML = `<p style="color: var(--accent);">NO GAMES FOUND. ENSURE STEAM PROFILE IS PUBLIC.</p>`;
+                    return;
+                }
+
+                listContainer.innerHTML = games.map(game => `
+                    <div class="game-card" data-label="${Math.round(game.playtime_forever / 60)} HOURS PLAYED">
+                        <img src="https://cdn.akamai.steamstatic.com/steam/apps/${game.appid}/header.jpg" onerror="this.src='https://via.placeholder.com/460x215?text=NO+IMAGE'">
+                        <div style="font-size:10px; margin-top:8px; color:var(--accent);">${game.name || 'Unknown Game'}</div>
+                        <div style="font-size:8px; color:var(--text); opacity:0.6;">${Math.round(game.playtime_forever / 60)} HOURS</div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                console.error("Steam load error:", err);
+                listContainer.innerHTML = `<p style="color: var(--accent);">ERROR: CONNECTION TO STEAM_ARCHIVE FAILED.</p>`;
+            }
+        }
+        
+        const themes = ['', 'theme-light', 'theme-green', 'theme-blue', 'theme-aero', 'theme-rgb', 'theme-rain'];
+        const labels = ['DEFAULT', 'CARAMEL', 'FOREST', 'COBALT', 'AERO PEAK', 'RAINBOW VOMIT', 'COZY LO-FI'];
+        let currentThemeIndex = 0;
+
+        /* --- THEME MENU LOGIC --- */
+        const themeMenu = document.getElementById('theme-menu');
+        function toggleThemeMenu() { themeMenu.classList.toggle('active'); }
+        function buildThemeMenu() {
+            themeMenu.innerHTML = '';
+            labels.forEach((label, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'theme-option';
+                btn.innerText = `// ${label}`;
+                btn.onclick = () => { applyTheme(index); toggleThemeMenu(); };
+                themeMenu.appendChild(btn);
+            });
+        }
+        function applyTheme(index) {
+            currentThemeIndex = index;
+            document.body.classList.remove('theme-light', 'theme-green', 'theme-blue', 'theme-aero', 'theme-rgb', 'theme-rain');
+            if (themes[index]) document.body.classList.add(themes[index]);
+            const isCloudy = themes[index] === 'theme-aero' || themes[index] === 'theme-rain';
+            if (isCloudy) { createClouds(); }
+            if (themes[index] === 'theme-rain') { drawRain(); }
+            document.getElementById('theme-label').innerText = labels[index];
+            localStorage.setItem('selectedThemeIndex', index);
+        }
+
+        /* --- EFFECTS LOGIC --- */
+        let rainDrops = []; let wind = 0; let windTarget = 0;
+        const rainCanvas = document.getElementById('rain-canvas');
+        const rainCtx = rainCanvas.getContext('2d');
+        function initRain() {
+            rainCanvas.width = window.innerWidth; rainCanvas.height = window.innerHeight;
+            rainDrops = []; for (let i = 0; i < 200; i++) rainDrops.push({ x: Math.random() * rainCanvas.width, y: Math.random() * rainCanvas.height, length: Math.random() * 25 + 15, speed: Math.random() * 10 + 12, opacity: Math.random() * 0.3 + 0.2, thickness: Math.random() * 1 + 0.8 });
+        }
+        function drawRain() {
+            if (!document.body.classList.contains('theme-rain')) return;
+            if (Math.abs(wind - windTarget) < 0.1) { windTarget = (Math.random() - 0.5) * 6; }
+            wind += (windTarget - wind) * 0.005;
+            rainCtx.clearRect(0, 0, rainCanvas.width, rainCanvas.height);
+            rainDrops.forEach(d => {
+                rainCtx.strokeStyle = `rgba(226, 168, 126, ${d.opacity * 0.5})`;
+                rainCtx.lineWidth = d.thickness; rainCtx.beginPath();
+                rainCtx.moveTo(d.x, d.y); rainCtx.lineTo(d.x + wind * 2, d.y + d.length); rainCtx.stroke();
+                d.y += d.speed; d.x += wind;
+                if (d.y > rainCanvas.height) { d.y = -d.length; d.x = Math.random() * rainCanvas.width; }
+            });
+            requestAnimationFrame(drawRain);
+        }
+        function createClouds() {
+            const cloudContainer = document.getElementById('aero-clouds');
+            cloudContainer.innerHTML = "";
+            for (let i = 0; i < 15; i++) {
+                let cloud = document.createElement('div'); cloud.className = 'cloud';
+                let size = Math.random() * 400 + 300;
+                cloud.style.width = size + 'px'; cloud.style.height = (size * 0.6) + 'px';
+                cloud.style.top = Math.random() * 100 + '%'; cloud.style.left = '-450px';
+                cloud.style.animationDuration = (Math.random() * 40 + 30) + 's';
+                cloud.style.animationDelay = (Math.random() * 30) + 's'; cloudContainer.appendChild(cloud);
+            }
+        }
+
+        function showPage(id) {
+            document.getElementById('page-content').innerHTML = contentData[id];
+            document.getElementById('nav-status').innerText = `LOC: // ${id.toUpperCase()}`;
+            document.getElementById('arcade-wrapper').style.display = (id === 'games') ? 'grid' : 'none';
+            if(id === 'games') { initSnake(); preInitStrike(); resetTGame(); }
+            if(id === 'library') { loadLibrary(); }
+        }
+
+        /* --- GLOBAL PARTICLE SYSTEM --- */
+        let globalParticles = [];
+        function createExplosion(x, y, color) {
+            for (let i = 0; i < 8; i++) {
+                globalParticles.push({ x, y, vx: (Math.random() - 0.5) * 4, vy: (Math.random() - 0.5) * 4, life: 1.0, color });
+            }
+        }
+        function updateParticles(ctx) {
+            globalParticles.forEach((p, pi) => {
+                p.x += p.vx; p.y += p.vy; p.life -= 0.02;
+                if (p.life <= 0) { globalParticles.splice(pi, 1); return; }
+                ctx.fillStyle = p.color; ctx.globalAlpha = p.life;
+                ctx.fillRect(p.x, p.y, 2, 2); ctx.globalAlpha = 1.0;
+            });
+        }
+
+        /* --- MINIGAMES (Snake/TTT/Strike) --- */
+        let tBoard = Array(9).fill(""); let tActive = true; let tScores = { w: 0, l: 0, d: 0 };
+        const winCombos = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+        function makeMove(i) { if (tBoard[i] === "" && tActive) { tBoard[i] = "X"; updateTGrid(); if (checkTWin("X")) { endTGame("W", checkTWin("X")); return; } if (tBoard.every(s => s !== "")) { endTGame("D"); return; } tActive = false; document.getElementById('ttt-msg').innerText = "AI THINKING..."; setTimeout(aiTMove, 400); } }
+        function aiTMove() { let bestScore = -Infinity; let move; for (let i = 0; i < 9; i++) { if (tBoard[i] === "") { tBoard[i] = "O"; let score = minimax(tBoard, 0, false); tBoard[i] = ""; if (score > bestScore) { bestScore = score; move = i; } } } tBoard[move] = "O"; updateTGrid(); tActive = true; document.getElementById('ttt-msg').innerText = "IMPOSSIBLE MODE ACTIVE"; if (checkTWin("O")) endTGame("L", checkTWin("O")); else if (tBoard.every(s => s !== "")) endTGame("D"); }
+        function minimax(board, depth, isMaximizing) { let res = checkWinnerInternal(); if (res === "O") return 10 - depth; if (res === "X") return depth - 10; if (board.every(s => s !== "")) return 0; if (isMaximizing) { let bestScore = -Infinity; for (let i = 0; i < 9; i++) { if (board[i] === "") { board[i] = "O"; let score = minimax(board, depth + 1, false); board[i] = ""; bestScore = Math.max(score, bestScore); } } return bestScore; } else { let bestScore = Infinity; for (let i = 0; i < 9; i++) { if (board[i] === "") { board[i] = "X"; let score = minimax(board, depth + 1, true); board[i] = ""; bestScore = Math.min(score, bestScore); } } return bestScore; } }
+        function checkWinnerInternal() { for (let c of winCombos) { if (tBoard[c[0]] && tBoard[c[0]] === tBoard[c[1]] && tBoard[c[0]] === tBoard[c[2]]) return tBoard[c[0]]; } return null; }
+        function checkTWin(p) { return winCombos.find(c => c.every(i => tBoard[i] === p)); }
+        function updateTGrid() { document.querySelectorAll('.ttt-cell').forEach((c, i) => { c.innerText = tBoard[i]; c.classList.remove('winner'); }); }
+        function endTGame(res, combo) { tActive = false; if (combo) combo.forEach(idx => document.querySelectorAll('.ttt-cell')[idx].classList.add('winner')); if (res === "W") { tScores.w++; document.getElementById('ttt-header').innerText = "SYSTEM: // ERROR"; } else if (res === "L") { tScores.l++; document.getElementById('ttt-header').innerText = "SYSTEM: // AI DOMINANCE"; } else { tScores.d++; document.getElementById('ttt-header').innerText = "SYSTEM: // STALEMATE"; } document.getElementById('s-w').innerText = tScores.w; document.getElementById('s-l').innerText = tScores.l; document.getElementById('s-d').innerText = tScores.d; setTimeout(resetTGame, 2000); }
+        function resetTGame() { tBoard = Array(9).fill(""); updateTGrid(); document.getElementById('ttt-header').innerText = "TTT_PROTO.V2"; tActive = true; }
+
+        /* --- UPDATED SNAKE_PROTO.V3 --- */
+        let sCanvas, sCtx, snake, food, dx, dy, sScore, sBest = 0, sLoop, sSpeed, nextDx, nextDy; 
+        const cellSize = 15;
+        function initSnake() { sCanvas = document.getElementById('snake-canvas'); sCtx = sCanvas.getContext('2d'); sCanvas.width = 300; sCanvas.height = 300; resetSnake(); }
+        function resetSnake() { snake = [{x: 150, y: 150}, {x: 135, y: 150}]; food = {x: 60, y: 60}; dx = 0; dy = 0; nextDx = 0; nextDy = 0; sScore = 0; sSpeed = 100; document.getElementById('snake-score').innerText = 0; document.getElementById('snake-msg').innerText = "WASD TO START"; if (sLoop) clearInterval(sLoop); sLoop = setInterval(drawSnake, sSpeed); }
+        
+        function drawSnake() {
+            sCtx.fillStyle = "rgba(10, 10, 10, 0.25)"; 
+            sCtx.fillRect(0, 0, 300, 300);
+
+            const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+            
+            const foodPulse = Math.sin(Date.now() / 150) * 3;
+            sCtx.shadowBlur = 15; sCtx.shadowColor = "#ff3333"; sCtx.fillStyle = "#ff3333";
+            sCtx.beginPath();
+            sCtx.arc(food.x + cellSize/2, food.y + cellSize/2, (cellSize/4) + (foodPulse/2), 0, Math.PI * 2);
+            sCtx.fill(); sCtx.shadowBlur = 0;
+
+            dx = nextDx; dy = nextDy;
+            if (dx !== 0 || dy !== 0) {
+                let head = { x: snake[0].x + dx, y: snake[0].y + dy };
+                if (head.x < 0 || head.x >= 300 || head.y < 0 || head.y >= 300 || snake.some(p => p.x === head.x && p.y === head.y)) { gameOverSnake(); return; }
+                snake.unshift(head);
+                if (head.x === food.x && head.y === food.y) {
+                    sScore += 10; document.getElementById('snake-score').innerText = sScore;
+                    food = { x: Math.floor(Math.random()*20)*cellSize, y: Math.floor(Math.random()*20)*cellSize };
+                    if (sSpeed > 40) { sSpeed -= 2; clearInterval(sLoop); sLoop = setInterval(drawSnake, sSpeed); }
+                    for(let i=0; i<8; i++) createExplosion(head.x + 7, head.y + 7, accent);
+                } else snake.pop();
+            }
+
+            snake.forEach((p, i) => {
+                const alpha = 1 - (i / snake.length) * 0.7;
+                sCtx.fillStyle = (i === 0) ? accent : `rgba(255,255,255, ${alpha})`;
+                if (i === 0) { sCtx.shadowBlur = 20; sCtx.shadowColor = accent; sCtx.fillRect(p.x, p.y, cellSize, cellSize); }
+                else { sCtx.shadowBlur = 0; sCtx.fillRect(p.x + 2, p.y + 2, cellSize - 4, cellSize - 4); }
+            });
+            updateParticles(sCtx);
+        }
+
+        function gameOverSnake() { 
+            if(sScore > sBest) sBest = sScore; 
+            document.getElementById('snake-best').innerText = sBest; 
+            sCanvas.style.transform = "translate(5px, 5px)";
+            setTimeout(() => sCanvas.style.transform = "translate(0, 0)", 100);
+            dx = 0; dy = 0; nextDx = 0; nextDy = 0; 
+            resetSnake(); 
+        }
+
+        let stCanvas, stCtx, stShip, stBullets = [], stEnemies = [], stLoop, stScore = 0, stDir = 1, stRunning = false, stWave = 1, stKeys = {};
+        function preInitStrike() { stCanvas = document.getElementById('strike-canvas'); stCtx = stCanvas.getContext('2d'); stCanvas.width = 300; stCanvas.height = 300; stCtx.fillStyle = "rgba(0,0,0,0.9)"; stCtx.fillRect(0,0,300,300); }
+        function startStrike() { if(!stRunning) { stRunning = true; stScore = 0; stWave = 1; document.getElementById('strike-score').innerText = 0; initStrikeWave(); } }
+        function initStrikeWave() { stShip = { x: 140, y: 270, w: 20, h: 10, lastShot: 0 }; stEnemies = []; for(let i=0; i<4; i++) for(let j=0; j<7; j++) stEnemies.push({ x: 30 + j*35, y: 40 + i*25, w: 18, h: 12, alive: true, pts: (4-i)*10 }); if(stLoop) clearInterval(stLoop); stLoop = setInterval(drawStrike, 1000/60); }
+        function drawStrike() {
+            stCtx.fillStyle = "rgba(10, 10, 10, 0.4)"; stCtx.fillRect(0, 0, 300, 300);
+            const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+            if(!stRunning) return;
+            if((stKeys['a'] || stKeys['arrowleft']) && stShip.x > 0) stShip.x -= 4;
+            if((stKeys['d'] || stKeys['arrowright']) && stShip.x < 280) stShip.x += 4;
+            if(stKeys[' '] || stKeys['w'] || stKeys['arrowup']) { let now = Date.now(); if(now - stShip.lastShot > 300) { stBullets.push({ x: stShip.x + 9, y: stShip.y }); stShip.lastShot = now; } }
+            stCtx.fillStyle = accent; stCtx.fillRect(stShip.x, stShip.y, stShip.w, stShip.h);
+            stBullets.forEach((b, bi) => { b.y -= 5; stCtx.fillStyle = "#fff"; stCtx.fillRect(b.x, b.y, 2, 8); if(b.y < 0) stBullets.splice(bi, 1); });
+            let hitEdge = false; let anyAlive = false;
+            stEnemies.forEach(e => {
+                if(!e.alive) return; anyAlive = true; e.x += stDir * (0.8 + stWave * 0.2); if(e.x > 280 || e.x < 5) hitEdge = true;
+                stCtx.fillStyle = "#ff3333"; stCtx.fillText("👾", e.x, e.y + 10);
+                stBullets.forEach((b, bi) => { if(b.x > e.x && b.x < e.x + e.w && b.y > e.y && b.y < e.y + e.h) { e.alive = false; stBullets.splice(bi, 1); stScore += e.pts; document.getElementById('strike-score').innerText = stScore; createExplosion(e.x+9, e.y+6, "#ff3333"); } });
+                if(e.y > 260) { stRunning = false; document.getElementById('strike-msg').innerText = "SYSTEM BREACHED"; }
+            });
+            if(hitEdge) { stDir *= -1; stEnemies.forEach(e => e.y += 10); }
+            if(!anyAlive) { stWave++; initStrikeWave(); }
+            updateParticles(stCtx);
+        }
+
+        /* --- STARFIELD & CORE --- */
+        const canvas = document.getElementById('starfield'); const ctx = canvas.getContext('2d');
+        let width, height, stars = []; const mouse = { x: -1000, y: -1000 };
+        function init() { 
+            width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; 
+            stars = []; for (let i = 0; i < 450; i++) stars.push({ x: Math.random() * width, y: Math.random() * height, char: ['*', '.', '+', '·'][Math.floor(Math.random() * 4)], speed: Math.random() * 2.0 + 0.5, opacity: Math.random() * 0.5 }); 
+            initRain(); buildThemeMenu(); showPage('home'); 
+            document.getElementById('yt-frame').src = `https://www.youtube.com/embed/videoseries?list=${uploadsID}`; 
+            
+            // Note: Set the parent parameter to your actual live domain (e.g., your-site.neo.com)
+            document.getElementById('twitch-player').src = `https://player.twitch.tv/?channel=rutucantv&parent=${window.location.hostname || "localhost"}&muted=true`;
+            
+            const saved = localStorage.getItem('selectedThemeIndex'); if (saved !== null) applyTheme(parseInt(saved));
+        }
+        function draw() { 
+            const isFullBackgroundTheme = document.body.classList.contains('theme-aero') || document.body.classList.contains('theme-rain');
+            if (isFullBackgroundTheme) { ctx.clearRect(0, 0, width, height); return requestAnimationFrame(draw); }
+            ctx.fillStyle = getComputedStyle(document.body).backgroundColor; ctx.fillRect(0, 0, width, height);
+            
+            const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+            let isMoving = stRunning || (typeof dx !== 'undefined' && (dx !== 0 || dy !== 0));
+            let warpMult = isMoving ? 10.0 : 1.0;
+            
+            stars.forEach(s => { 
+                s.y += (s.speed * warpMult); if (s.y > height) { s.y = -10; s.x = Math.random() * width; } 
+                const dist = Math.hypot(s.x - mouse.x, s.y - mouse.y);
+                if (dist < 100) {
+                    ctx.fillStyle = accentColor; ctx.shadowBlur = 10; ctx.shadowColor = accentColor;
+                } else {
+                    ctx.fillStyle = `rgba(136, 136, 136, ${s.opacity})`; ctx.shadowBlur = 0;
+                }
+                ctx.fillText(s.char, s.x, s.y); 
+            });
+            ctx.shadowBlur = 0;
+            requestAnimationFrame(draw); 
+        }
+
+        window.addEventListener('keydown', e => {
+            const key = e.key.toLowerCase(); stKeys[key] = true;
+            if ((key === "w" || key === "arrowup") && dy === 0) { nextDx = 0; nextDy = -cellSize; }
+            if ((key === "s" || key === "arrowdown") && dy === 0) { nextDx = 0; nextDy = cellSize; }
+            if ((key === "a" || key === "arrowleft") && dx === 0) { nextDx = -cellSize; nextDy = 0; }
+            if ((key === "d" || key === "arrowright") && dx === 0) { nextDx = cellSize; nextDy = 0; }
+        });
+        window.addEventListener('keyup', e => { stKeys[e.key.toLowerCase()] = false; });
+        window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
+        window.addEventListener('click', (e) => { if (!e.target.closest('.controls-group')) { const m = document.getElementById('theme-menu'); if(m) m.classList.remove('active'); } });
+        document.addEventListener('mouseover', (e) => { const t = e.target.closest('[data-label]'); if (t) document.getElementById('hover-status').innerText = `INSPECT: // ${t.getAttribute('data-label')}`; });
+        document.addEventListener('mouseout', (e) => { if (e.target.closest('[data-label]')) document.getElementById('hover-status').innerText = `INSPECT: // NULL`; });
+        window.addEventListener('resize', init); init(); draw();
+    </script>
+</body>
+</html>
